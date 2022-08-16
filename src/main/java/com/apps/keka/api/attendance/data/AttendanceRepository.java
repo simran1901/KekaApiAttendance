@@ -11,6 +11,6 @@ public interface AttendanceRepository extends CrudRepository<AttendanceEntity, L
 
     void deleteByUserIdAndDate(String userId, Date date);
 
-    @Query(value = "SELECT * FROM attendance WHERE userId = ?1 AND date BETWEEN ?2 AND ?3 ORDER BY date ASC", nativeQuery = true)
+    @Query(value = "SELECT * FROM attendance WHERE user_id = ?1 AND date BETWEEN ?2 AND ?3 ORDER BY date ASC", nativeQuery = true)
     List<AttendanceEntity> findByUserIdInDuration(String userId, Date from, Date to);
 }

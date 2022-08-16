@@ -32,7 +32,9 @@ public class AttendanceController {
     }
 
     // mark attendance
-    @PatchMapping(value = "/{userId}")
+    @PatchMapping(value = "/{userId}",
+            consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
+            produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<AttendanceDto> markAttendance(@RequestHeader(value = "Authorization") String authHeader,
                                                         @PathVariable("userId") String userId,
                                                         @RequestBody MarkAttendanceRequestModel details) {
@@ -45,9 +47,11 @@ public class AttendanceController {
 
         AttendanceDto attendanceDto = modelMapper.map(details, AttendanceDto.class);
         attendanceDto.setUserId(userId);
-
-        attendanceDto = attendanceService.markAttendance(attendanceDto);
-
+        try {
+            attendanceDto = attendanceService.markAttendance(attendanceDto);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.ALREADY_REPORTED);
+        }
         return ResponseEntity.status(HttpStatus.OK).body(attendanceDto);
     }
 
@@ -60,7 +64,12 @@ public class AttendanceController {
         }
         String userId = attendanceService.getUserIdFromToken(authHeader);
 
-        attendanceService.checkIn(userId);
+        try {
+            attendanceService.checkIn(userId);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.ALREADY_REPORTED);
+        }
+
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -68,14 +77,19 @@ public class AttendanceController {
     // check out
     @PatchMapping(consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity checkOut(@RequestHeader(value = "Authorization") String authHeader) {
+    public ResponseEntity<HttpStatus> checkOut(@RequestHeader(value = "Authorization") String authHeader) {
         if (Boolean.FALSE.equals(usersServiceClient.isUser(authHeader).getBody())) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         String userId = attendanceService.getUserIdFromToken(authHeader);
-
-        attendanceService.checkOut(userId);
-
+        try {
+            attendanceService.checkOut(userId);
+        } catch (Exception e) {
+            if (e.getLocalizedMessage().equals("checkout"))
+                return new ResponseEntity<>(HttpStatus.ALREADY_REPORTED);
+            else
+                return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

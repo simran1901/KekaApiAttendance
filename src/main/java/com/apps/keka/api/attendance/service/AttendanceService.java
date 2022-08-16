@@ -10,15 +10,15 @@ import java.sql.Time;
 import java.util.List;
 
 public interface AttendanceService {
-    AttendanceDto markAttendance(AttendanceDto details);
+    AttendanceDto markAttendance(AttendanceDto details) throws Exception;
 
     Date getCurrentDate();
 
     Time getCurrentTime();
 
-    void checkIn(String userId);
+    void checkIn(String userId) throws Exception;
 
-    void checkOut(String userId);
+    void checkOut(String userId) throws Exception;
 
     public List<AttendanceResponseModel> getAttendance(String userId, GetAttendanceRequestModel details);
 
