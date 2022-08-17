@@ -1,4 +1,4 @@
-package com.apps.keka.api.attendance.ui.model;
+package com.apps.keka.api.attendance.ui.model.request;
 
 import org.springframework.format.annotation.DateTimeFormat;
 

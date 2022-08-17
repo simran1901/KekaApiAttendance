@@ -1,4 +1,4 @@
-package com.apps.keka.api.attendance.ui.model;
+package com.apps.keka.api.attendance.ui.model.response;
 
 import java.sql.Date;
 import java.sql.Time;

@@ -1,9 +1,8 @@
 package com.apps.keka.api.attendance.service;
 
 import com.apps.keka.api.attendance.shared.AttendanceDto;
-import com.apps.keka.api.attendance.ui.model.AttendanceResponseModel;
-import com.apps.keka.api.attendance.ui.model.GetAttendanceRequestModel;
-import io.jsonwebtoken.Jwts;
+import com.apps.keka.api.attendance.ui.model.response.AttendanceResponseModel;
+import com.apps.keka.api.attendance.ui.model.request.GetAttendanceRequestModel;
 
 import java.sql.Date;
 import java.sql.Time;

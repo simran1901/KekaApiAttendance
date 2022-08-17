@@ -3,8 +3,10 @@ package com.apps.keka.api.attendance.ui.controllers;
 import com.apps.keka.api.attendance.data.UsersServiceClient;
 import com.apps.keka.api.attendance.service.AttendanceService;
 import com.apps.keka.api.attendance.shared.AttendanceDto;
-import com.apps.keka.api.attendance.ui.model.*;
 
+import com.apps.keka.api.attendance.ui.model.request.GetAttendanceRequestModel;
+import com.apps.keka.api.attendance.ui.model.request.MarkAttendanceRequestModel;
+import com.apps.keka.api.attendance.ui.model.response.AttendanceListResponseModel;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 
