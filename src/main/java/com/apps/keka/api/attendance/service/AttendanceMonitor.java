@@ -40,7 +40,7 @@ public class AttendanceMonitor {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
-        List<UserResponseModel> usersList = usersServiceClient.getUsers().getBody();
+        List<UserResponseModel> usersList = usersServiceClient.getUsers(environment.getProperty("default.admin.token")).getBody();
         List<String> userIds = usersList.stream().map(p -> p.getUserId()).toList();
 
         java.util.Date currentDate = new java.util.Date();

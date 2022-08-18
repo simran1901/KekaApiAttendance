@@ -33,7 +33,7 @@ public interface UsersServiceClient {
     @GetMapping(value = "/admins",
             consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<List<UserResponseModel>> getUsers();
+    public ResponseEntity<List<UserResponseModel>> getUsers(@RequestHeader("Authorization") String authHeader);
 }
 
 @Component
@@ -83,7 +83,7 @@ class UsersServiceClientFallback implements UsersServiceClient {
     }
 
     @Override
-    public ResponseEntity<List<UserResponseModel>> getUsers() {
+    public ResponseEntity<List<UserResponseModel>> getUsers(String authHeader) {
         if (cause instanceof FeignException && ((FeignException) cause).status() == 404) {
             logger.error("404 error took place when isUser was called. Error message: "
                     + cause.getLocalizedMessage());
