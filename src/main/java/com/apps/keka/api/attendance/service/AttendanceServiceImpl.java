@@ -49,21 +49,29 @@ public class AttendanceServiceImpl implements AttendanceService {
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
         if (attendanceEntity != null) {
-            if (details.isMarked())
-                throw new Exception("Attendance already marked");
-            else {
-                attendanceRepository.deleteByUserIdAndDate(details.getUserId(), details.getDate());
+            if (details.isMarked()) {
+                if (attendanceEntity.getCheckIn() == null && attendanceEntity.getCheckOut() == null) {
+                    attendanceEntity.setCheckIn(Time.valueOf(environment.getProperty("checkin.time")));
+                    attendanceEntity.setCheckOut(Time.valueOf(environment.getProperty("checkout.time")));
+                    attendanceRepository.save(attendanceEntity);
+                } else {
+                    throw new Exception("Attendance already marked");
+                }
+            } else {
+                attendanceEntity.setCheckIn(null);
+                attendanceEntity.setCheckOut(null);
+                attendanceRepository.save(attendanceEntity);
             }
         } else {
+            attendanceEntity = modelMapper.map(details, AttendanceEntity.class);
             if (details.isMarked()) {
-                details.setCheckIn(Time.valueOf("09:30:00"));
-                details.setCheckOut(Time.valueOf("18:30:00"));
-
-                attendanceEntity = modelMapper.map(details, AttendanceEntity.class);
-                attendanceRepository.save(attendanceEntity);
+                attendanceEntity.setCheckIn(Time.valueOf(environment.getProperty("checkin.time")));
+                attendanceEntity.setCheckOut(Time.valueOf(environment.getProperty("checkout.time")));
             } else {
-                throw new Exception("Attendance already not marked");
+                attendanceEntity.setCheckIn(null);
+                attendanceEntity.setCheckOut(null);
             }
+            attendanceRepository.save(attendanceEntity);
         }
 
         returnValue = modelMapper.map(attendanceEntity, AttendanceDto.class);
@@ -93,17 +101,23 @@ public class AttendanceServiceImpl implements AttendanceService {
         // if already checked in for today
         // get attendance
 
-        Date today = getCurrentDate();
-        AttendanceEntity attendanceEntity = attendanceRepository.findByUserIdAndDate(userId, today);
-        if (attendanceEntity == null) {
-            attendanceEntity = new AttendanceEntity();
-            attendanceEntity.setUserId(userId);
-            attendanceEntity.setDate(today);
-            attendanceEntity.setCheckIn(getCurrentTime());
-            attendanceRepository.save(attendanceEntity);
+        Time currentTime = getCurrentTime();
+        if (currentTime.before(Time.valueOf(environment.getProperty("checkout.time")))) {
+            Date today = getCurrentDate();
+            AttendanceEntity attendanceEntity = attendanceRepository.findByUserIdAndDate(userId, today);
+            if (attendanceEntity == null) {
+                attendanceEntity = new AttendanceEntity();
+                attendanceEntity.setUserId(userId);
+                attendanceEntity.setDate(today);
+                attendanceEntity.setCheckIn(getCurrentTime());
+                attendanceRepository.save(attendanceEntity);
+            } else {
+                throw new Exception("Already checked in or marked absent by admin");
+            }
         } else {
-            throw new Exception("Already checked in");
+            throw new Exception("Check in failed");
         }
+
 
     }
 
@@ -116,7 +130,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         if (attendanceEntity == null) {
             throw new Exception("checkin");
         } else {
-            if (attendanceEntity.getCheckOut() == null) {
+            if (attendanceEntity.getCheckOut() == null && attendanceEntity.getCheckIn() != null) {
                 attendanceEntity.setCheckOut(getCurrentTime());
                 attendanceRepository.save(attendanceEntity);
             } else {

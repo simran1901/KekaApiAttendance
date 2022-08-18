@@ -21,7 +21,7 @@ public class AttendanceEntity implements Serializable {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date date;
 
-    @Column(nullable = false, length = 8)
+    @Column(length = 8)
     @DateTimeFormat(pattern = "HH:mm:ss")
     private Time checkIn;
 
@@ -29,7 +29,7 @@ public class AttendanceEntity implements Serializable {
     @DateTimeFormat(pattern = "HH:mm:ss")
     private Time checkOut;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String userId;
 
     public long getId() {

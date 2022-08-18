@@ -31,6 +31,8 @@ public class FeignErrorDecoder implements ErrorDecoder {
                     return new ResponseStatusException(HttpStatus.valueOf(response.status()), "users.exceptions.isUser-not-found");
                 } else if (methodKey.contains("isAdmin")) {
                     return new ResponseStatusException(HttpStatus.valueOf(response.status()), "users.exceptions.isAdmin-not-found");
+                } else if (methodKey.contains("getUsers")) {
+                    return new ResponseStatusException(HttpStatus.valueOf(response.status()), "get users not found");
                 }
                 break;
             }

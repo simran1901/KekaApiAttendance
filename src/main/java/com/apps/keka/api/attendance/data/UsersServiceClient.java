@@ -1,5 +1,6 @@
 package com.apps.keka.api.attendance.data;
 
+import com.apps.keka.api.attendance.ui.model.response.UserResponseModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
@@ -13,6 +14,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import feign.FeignException;
 import org.springframework.web.bind.annotation.RequestHeader;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @FeignClient(name = "users-ws", fallbackFactory = UsersFallbackFactory.class)
 public interface UsersServiceClient {
 
@@ -25,6 +29,11 @@ public interface UsersServiceClient {
             consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Boolean> isAdmin(@RequestHeader(value = "Authorization") String authHeader);
+
+    @GetMapping(value = "/admins",
+            consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
+            produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<List<UserResponseModel>> getUsers();
 }
 
 @Component
@@ -71,6 +80,17 @@ class UsersServiceClientFallback implements UsersServiceClient {
         }
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
+    }
+
+    @Override
+    public ResponseEntity<List<UserResponseModel>> getUsers() {
+        if (cause instanceof FeignException && ((FeignException) cause).status() == 404) {
+            logger.error("404 error took place when isUser was called. Error message: "
+                    + cause.getLocalizedMessage());
+        } else {
+            logger.error("Other error took place: " + cause.getLocalizedMessage());
+        }
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ArrayList<>());
     }
 
 }
