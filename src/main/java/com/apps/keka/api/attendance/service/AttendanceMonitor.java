@@ -35,7 +35,7 @@ public class AttendanceMonitor {
         this.usersServiceClient = usersServiceClient;
     }
 
-    @Scheduled(cron = "0 30 18 * * ?")
+    @Scheduled(cron = "0 31 18 * * ?")
     public void markFullAttendance() {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);

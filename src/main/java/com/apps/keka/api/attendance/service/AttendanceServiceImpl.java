@@ -100,32 +100,23 @@ public class AttendanceServiceImpl implements AttendanceService {
     public void checkIn(String userId) throws Exception {
         // if already checked in for today
         // get attendance
-
-        Time currentTime = getCurrentTime();
-        if (currentTime.before(Time.valueOf(environment.getProperty("checkout.time")))) {
-            Date today = getCurrentDate();
-            AttendanceEntity attendanceEntity = attendanceRepository.findByUserIdAndDate(userId, today);
-            if (attendanceEntity == null) {
-                attendanceEntity = new AttendanceEntity();
-                attendanceEntity.setUserId(userId);
-                attendanceEntity.setDate(today);
-                attendanceEntity.setCheckIn(getCurrentTime());
-                attendanceRepository.save(attendanceEntity);
-            } else {
-                throw new Exception("Already checked in or marked absent by admin");
-            }
+        Date today = getCurrentDate();
+        AttendanceEntity attendanceEntity = attendanceRepository.findByUserIdAndDate(userId, today);
+        if (attendanceEntity == null) {
+            attendanceEntity = new AttendanceEntity();
+            attendanceEntity.setUserId(userId);
+            attendanceEntity.setDate(today);
+            attendanceEntity.setCheckIn(getCurrentTime());
+            attendanceRepository.save(attendanceEntity);
         } else {
-            throw new Exception("Check in failed");
+            throw new Exception("Already checked in or marked by admin");
         }
-
-
     }
 
     @Override
     public void checkOut(String userId) throws Exception {
         // if already checked out for today
         // get attendance
-
         AttendanceEntity attendanceEntity = attendanceRepository.findByUserIdAndDate(userId, getCurrentDate());
         if (attendanceEntity == null) {
             throw new Exception("checkin");
